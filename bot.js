@@ -1,6 +1,7 @@
 var irc = require('irc'),
     fs = require('fs'),
-    http = require('http'),
+    express = require('express'),
+    app = express(),
     rc = require('./rc'),
     client, responses = [];
 
@@ -56,10 +57,20 @@ client.addListener('message', function(nick, target, text, message) {
 	client.say(target, "Reporting in!");
 });
 
-http.Server(function(req, res) {
-	if(req.method !== 'POST') {
-		res.statusCode = 404;
-		res.end();
-	}
-	console.log(req);
-}).listen(8181);
+app.configure(function() {
+	app.use(express.bodyParser());
+	app.use(express.logger());
+});
+
+app.post('/', function(req, res) {
+	var payload = JSON.parse(req.body.payload);
+	rc.channels.forEach(function(channel) {
+		client.say(channel, irc.colors.codes.light_gray + payload.repository.name + irc.colors.codes.reset + " (" + irc.colors.codes.light_blue + payload.repository.language + irc.colors.codes.reset + ") had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
+		payload.commits.forEach(function(commit) {
+			client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message);
+		});
+	});
+});
+
+
+app.listen(8181);
