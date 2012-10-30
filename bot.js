@@ -50,6 +50,13 @@ client.addListener('message', function(nick, target, text, message) {
 	responses.push(text);
 });
 
+client.addListener('nick', function(onick, nnick, channels) {
+	if(rc.blnicks.indexOf(onick) === -1) {
+		return;
+	}
+	rc.blnicks.push(nnick);
+});
+
 client.addListener('message', function(nick, target, text, message) {
 	if(!/^\.bots/.test(text)) {
 		return;
