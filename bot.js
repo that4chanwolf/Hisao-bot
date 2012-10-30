@@ -12,7 +12,7 @@ for( var i = 0; i < n.length; i++ ) {
 client = new irc.Client(rc.network, rc.nick, {
 	userName: rc.user,
 	realName: rc.real,
-	channels: [rc.channel]
+	channels: rc.channels
 });
 
 client.addListener('registered', function() {
