@@ -1,5 +1,6 @@
 var irc = require('irc'),
     fs = require('fs'),
+    http = require('http'),
     rc = require('./rc'),
     client, responses = [];
 
@@ -54,3 +55,11 @@ client.addListener('message', function(nick, target, text, message) {
 	}
 	client.say(target, "Reporting in!");
 });
+
+http.Server(function(req, res) {
+	if(req.method !== 'POST') {
+		res.statusCode = 404;
+		res.end();
+	}
+	console.log(req);
+}).listen(8181);
