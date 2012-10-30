@@ -47,3 +47,10 @@ client.addListener('message', function(nick, target, text, message) {
 	}
 	responses.push(text);
 });
+
+client.addListener('message', function(nick, target, text, message) {
+	if(!/^\.bots/.test(text)) {
+		return;
+	}
+	client.say(target, "Reporting in!");
+});
