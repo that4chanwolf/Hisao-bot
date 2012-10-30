@@ -6,5 +6,7 @@ module.exports = {
 		"#nyaa-nyaa",
 		"#your-shitty-channel"
 	],
+	blnicks: [
+	],
 	ns: ''
 }
