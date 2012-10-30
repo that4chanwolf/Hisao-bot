@@ -36,10 +36,7 @@ var writeInterval = setInterval(function() {
 
 client.addListener('message', function(nick, target, text, message) {
 	console.log(nick, target, text);
-	if(text.toUpperCase() !== text) {
-		return;
-	}
-	if(!/[A-Z]/.test(text)) {
+	if(text.toUpperCase() !== text || !/[A-Z]/.test(text) || !(text.length > 1) ) {
 		return;
 	}
 	for (var i = 0, n = text.length; i < n; i++) {
