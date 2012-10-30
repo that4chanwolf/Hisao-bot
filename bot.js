@@ -39,6 +39,9 @@ client.addListener('message', function(nick, target, text, message) {
 	if(text.toUpperCase() !== text) {
 		return;
 	}
+	if(!/[A-Z]/.test(text)) {
+		return;
+	}
 	for (var i = 0, n = text.length; i < n; i++) {
 		if (text.charCodeAt( i ) > 255) { 
 			return; 
