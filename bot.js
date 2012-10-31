@@ -1,15 +1,16 @@
 var irc = require('irc'),
     fs = require('fs'),
+    request = require('request'),
     express = require('express'),
     app = express(),
     rc = require('./rc'),
-    client, responses = [];
+    client, responses = [], urls = {};
 
 var n = JSON.parse(fs.readFileSync(__dirname + '/responses.txt', 'utf8'));
 for( var i = 0; i < n.length; i++ ) {
-	console.log(n[i]);
 	responses.push(n[i]);
 }
+urls = JSON.parse(fs.readFileSync(__dirname + '/urls.txt', 'utf8')) || {}; 
 
 client = new irc.Client(rc.network, rc.nick, {
 	userName: rc.user,
@@ -30,6 +31,13 @@ var writeInterval = setInterval(function() {
 			throw err;
 		} else {
 			console.log("Responses saved!");
+		}
+	});
+	fs.writeFile('urls.txt', JSON.stringify(urls, null, "\t"), function(err) {
+		if(err) {
+			throw err;
+		} else {
+			console.log("URLs saved");
 		}
 	});
 }, 50000);
@@ -74,7 +82,18 @@ app.post('/', function(req, res) {
 	rc.channels.forEach(function(channel) {
 		client.say(channel, irc.colors.codes.light_gray + payload.repository.name + irc.colors.codes.reset + " (" + irc.colors.codes.light_blue + payload.repository.language + irc.colors.codes.reset + ") had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
 		payload.commits.forEach(function(commit) {
-			client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset);
+			if(!urls[commit.url]) {
+				request.get("http://waa.ai/api.php?url=" + commit.url,function (error, response, body) {
+					if(error || !response || !body || body.trim() === "") {
+						client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message.replace(/\n/gim, " ") + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset);
+					} else {
+						client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message.replace(/\n/gim, " ") + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset + " " + irc.colors.codes.light_blue + body.trim());
+						urls[commit.url] = body.trim();
+					}
+				});
+			} else {
+				client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message.replace("\n", ", ") + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset + " " + irc.colors.codes.light_blue + urls[commit.url]);
+			}
 		});
 	});
 });
