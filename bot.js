@@ -89,18 +89,18 @@ client.addListener('message#', function(nick, target, text, message) {
 		var user = text.split(" ")[1];
 		request("https://api.github.com/users/" + user + "/repos", function(e,r,b) {
 			var json = JSON.parse(b) || {},
-			    index = 0,
+			    index, repo,
 			    channel = target;
-			client.say(channel, irc.colors.codes.light_grey + user + irc.colors.codes.reset + " has " + irc.colors.codes.light_red + json.length + irc.colors.codes.reset + " repos.");
-			json.forEach(function(repo) {
+			client.say(channel, irc.colors.codes.light_gray + user + irc.colors.codes.reset + " has " + irc.colors.codes.light_red + json.length + irc.colors.codes.reset + " repos.");
+			for(index = 0; index < json.length; index++) {
+				repo = json[index];
 				if(index < 3) {
-					client.say(channel, irc.colors.codes.light_magenta + repo.name + irc.colors.codes.reset + + " " + repo.description.trim() + " (" + irc.colors.codes.light_blue + ( typeof repo.language !== "undefined" ? repo.language : "None" ) + irc.colors.codes.reset + ")");
-					index++;
+					client.say(channel, irc.colors.codes.light_magenta + repo.name + irc.colors.codes.reset + " " + " " + repo.description.trim() + " (" + irc.colors.codes.light_blue + ( typeof repo.language !== "undefined" ? repo.language : "None" ) + irc.colors.codes.reset + ")");
 				} else {
 					client.say(channel, "Too many repositories, stopping here...");
 					return;
 				}
-			});
+			}
 		});
 		return;
 	}
