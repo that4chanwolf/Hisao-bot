@@ -66,10 +66,22 @@ client.addListener('nick', function(onick, nnick, channels) {
 });
 
 client.addListener('message#', function(nick, target, text, message) {
-	if(!/^\.bots/.test(text)) {
-		return;
+	if(/^\.bots/.test(text)) {
+		client.say(target, "Reporting in!");
 	}
-	client.say(target, "Reporting in!");
+	if(/^\.shorten/.test(text)) {
+		if(typeof urls[text.split(" ")[1]] === "undefined") {
+			request("http://waa.ai/api.php?url=" + text.split(" ")[1], function(e,r,b) {
+				if(e) {
+					console.error(e);
+				}
+				client.say(target, b);
+				urls[text.split(" ")[1]] = b;
+			});
+		} else {
+			client.say(target, urls[text.split(" ")[1]]);
+		}
+	}
 });
 
 app.configure(function() {
