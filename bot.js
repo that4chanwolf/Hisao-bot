@@ -68,19 +68,41 @@ client.addListener('nick', function(onick, nnick, channels) {
 client.addListener('message#', function(nick, target, text, message) {
 	if(/^\.bots/.test(text)) {
 		client.say(target, "Reporting in!");
+		return;
 	}
 	if(/^\.shorten/.test(text)) {
-		if(typeof urls[text.split(" ")[1]] === "undefined") {
-			request("http://waa.ai/api.php?url=" + text.split(" ")[1], function(e,r,b) {
+		var url = text.split(" ")[1]
+		if(typeof urls[url] === "undefined") {
+			request("http://waa.ai/api.php?url=" + url, function(e,r,b) {
 				if(e) {
 					console.error(e);
 				}
 				client.say(target, b);
-				urls[text.split(" ")[1]] = b;
+				urls[url] = b;
 			});
 		} else {
-			client.say(target, urls[text.split(" ")[1]]);
+			client.say(target, urls[url]);
 		}
+		return;
+	}
+	if(/^\.gh/.test(text)) {
+		var user = text.split(" ")[1];
+		request("https://api.github.com/users/" + user + "/repos", function(e,r,b) {
+			var json = JSON.parse(b) || {},
+			    index = 0,
+			    channel = target;
+			client.say(channel, irc.colors.codes.light_grey + user + irc.colors.codes.reset + " has " + irc.colors.codes.light_red + json.length + irc.colors.codes.reset + " repos.");
+			json.forEach(function(repo) {
+				if(index < 3) {
+					client.say(channel, irc.colors.codes.light_magenta + repo.name + irc.colors.codes.reset + + " " + repo.description.trim() + " (" + irc.colors.codes.light_blue + ( typeof repo.language !== "undefined" ? repo.language : "None" ) + irc.colors.codes.reset + ")");
+					index++;
+				} else {
+					client.say(channel, "Too many repositories, stopping here...");
+					return;
+				}
+			});
+		});
+		return;
 	}
 });
 
