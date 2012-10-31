@@ -42,7 +42,7 @@ var writeInterval = setInterval(function() {
 	});
 }, 50000);
 
-client.addListener('message', function(nick, target, text, message) {
+client.addListener('message#', function(nick, target, text, message) {
 	console.log(nick, target, text);
 	if(text.toUpperCase() !== text || !/[A-Z]/.test(text) || !(text.length > 1) || rc.blnicks.indexOf(nick) !== -1 ) {
 		return;
@@ -65,7 +65,7 @@ client.addListener('nick', function(onick, nnick, channels) {
 	rc.blnicks.push(nnick);
 });
 
-client.addListener('message', function(nick, target, text, message) {
+client.addListener('message#', function(nick, target, text, message) {
 	if(!/^\.bots/.test(text)) {
 		return;
 	}
