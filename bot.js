@@ -118,7 +118,7 @@ client.addListener('message#', function(nick, target, text, message) {
 			for(var i = 0; i < json.item.length; i++) {
 				item = json.item[i];
 				if(i < 4) {
-					client.say(target, item.title + " [" + irc.colors.codes.light_green + item.description.split(" - ")[1].trim() + irc.colors.codes.reset + "] " + irc.colors.codes.light_blue + item.guid);
+					client.say(target, irc.colors.codes.light_red + item.category + irc.colors.codes.reset + " " + item.title + " [" + irc.colors.codes.light_green + item.description.split(" - ")[1].trim() + irc.colors.codes.reset + "] " + irc.colors.codes.light_blue + item.guid);
 				} else {
 					return;
 				}
