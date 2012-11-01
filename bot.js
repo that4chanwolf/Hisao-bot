@@ -110,10 +110,11 @@ client.addListener('message#', function(nick, target, text, message) {
 			var json,
 			    item;
 			try {
-				json = JSON.parse(b).query.results;			
+				json = JSON.parse(b).query.results;
 			} catch(e) {
-				console.log(e);
-				console.log(b);
+				json = JSON.parse(b).error;
+				client.say(target, "[" + irc.colors.codes.dark_red + "ERROR" + irc.colors.codes.reset + "] " + json.description);
+				return;
 			}
 			for(var i = 0; i < json.item.length; i++) {
 				item = json.item[i];
