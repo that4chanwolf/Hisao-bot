@@ -66,6 +66,9 @@ client.addListener('nick', function(onick, nnick, channels) {
 });
 
 client.addListener('message#', function(nick, target, text, message) {
+	if(rc.blnicks.indexOf(nick) !== -1) {
+		return;
+	}
 	if(/^\.bots/.test(text)) {
 		client.say(target, "Reporting in!");
 		return;
@@ -87,17 +90,26 @@ client.addListener('message#', function(nick, target, text, message) {
 	}
 	if(/^\.gh/.test(text)) {
 		var user = text.split(" ")[1];
+		if(typeof user === "undefined") {
+			client.say(target, nick + ": Fuck you.")
+			return;
+		}
 		request("https://api.github.com/users/" + user + "/repos", function(e,r,b) {
 			var json = JSON.parse(b),
 			    index, repo,
 			    channel = target;
+			if(typeof json.length === "undefined") {
+				client.say(channel, "User does not exist");
+				console.log(json);
+				return;
+			}
 			client.say(channel, irc.colors.codes.light_gray + user + irc.colors.codes.reset + " has " + irc.colors.codes.light_red + json.length + irc.colors.codes.reset + " repos.");
 			for(index = 0; index < json.length; index++) {
 				repo = json[index];
 				if(index < 3) {
-					client.say(channel, irc.colors.codes.light_magenta + repo.name + irc.colors.codes.reset + " " + " " + repo.description.trim() + " (" + irc.colors.codes.light_blue + ( typeof repo.language !== "undefined" ? repo.language : "None" ) + irc.colors.codes.reset + ")");
+					client.say(channel, irc.colors.codes.light_magenta + repo.name + irc.colors.codes.reset + " " + " " + repo.description.trim() + " (" + irc.colors.codes.light_blue + ( repo.language !== null ? repo.language : "None" ) + irc.colors.codes.reset + ")");
 				} else {
-					client.say(channel, "Too many repositories, stopping here...");
+					client.say(channel, "...and " + irc.colors.codes.light_red + (json.length - 3) + irc.colors.codes.reset + " more!");
 					return;
 				}
 			}
@@ -114,6 +126,10 @@ client.addListener('message#', function(nick, target, text, message) {
 			} catch(e) {
 				json = JSON.parse(b).error;
 				client.say(target, "[" + irc.colors.codes.dark_red + "ERROR" + irc.colors.codes.reset + "] " + json.description);
+				return;
+			}
+			if(json === null) {
+				client.say(target, nick + ": No items found.");
 				return;
 			}
 			for(var i = 0; i < json.item.length; i++) {
