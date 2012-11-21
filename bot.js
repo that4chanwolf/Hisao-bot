@@ -1,16 +1,35 @@
 var irc = require('irc'),
     fs = require('fs'),
+    net = require('net'),
+    os = require('os'),
+    crypto = require('crypto'),
     request = require('request'),
     express = require('express'),
     app = express(),
     rc = require('./rc'),
-    client, responses = [], urls = {};
+    client, responses = [], urls = {},
+    DCCPORT = 55555;
 
 var n = JSON.parse(fs.readFileSync(__dirname + '/responses.txt', 'utf8'));
 for( var i = 0; i < n.length; i++ ) {
 	responses.push(n[i]);
 }
 urls = JSON.parse(fs.readFileSync(__dirname + '/urls.txt', 'utf8')) || {}; 
+
+var ip2int = function(dotted) { // Takes an IP adress and turns it into the format needed for DCC chats
+	var exp = 3,
+	    intip = 0;
+
+	var split = dotted.split(".");
+
+	for(var i in split) {
+		var quad = split[i];
+		intip += Number(quad) * Math.pow(256, exp);
+		exp--;
+	}
+
+	return intip;
+}
 
 client = new irc.Client(rc.network, rc.nick, {
 	userName: rc.user,
@@ -143,6 +162,110 @@ client.addListener('message#', function(nick, target, text, message) {
 		});
 		return;
 	}
+});
+
+client.addListener('pm', function(nick, text) {
+	if(!/^admin/i.test(text)) {
+		return null;
+	}
+	var interfaces = os.networkInterfaces();
+	var addresses = [];
+	var address;
+	
+	for(var i in interfaces) {
+		if(interfaces[i].length !== 1) {
+			continue;
+		}
+		if(interfaces[i][0].family === 'IPv4' && !interfaces[i][0].internal) {
+			addresses.push(interfaces[i][0].address);
+		}
+	}
+	
+	if(addresses.length === 1) {
+		address = addresses[0];
+		console.log(address);
+	} else { 
+		client.say(nick, "There was an error binding to an address, attempting");
+		return console.warn('More than one IP address was found, could not bind.');
+	}
+	
+	if(DCCPORT > 65535) {
+		DCCPORT = 55555;
+	}
+	var server = net.createServer(function(stream) {
+		stream.setEncoding('utf8');
+		var times = 0;
+		stream.on('connect', function() {
+			console.log('stream connected');
+			stream.write('welcome to the admin panel.\r\n');
+			stream.write('Enter your password: \r\n');
+		});
+		stream.on('data', function(line) {
+			if(times === 0) {
+				var hash1 = crypto.createHash('sha1'),
+				    hash2 = crypto.createHash('sha1');
+				if(hash1.update(line.trim()).digest('hex') === hash2.update(rc.passwd).digest('hex')) {
+					stream.write('Sucessfully logged in.\r\n');
+				} else {
+					stream.write('Error logging in. Closing socket.\r\n');
+					stream.end();
+					return;
+				}
+				times++;
+				return;
+			}
+			var command = line.split(" ")[0];
+			if(command === "say") {
+				var chan = line.split(" ")[1];
+				var re = new RegExp('^say \\' + chan.replace(/\//,'\/') + " ");
+				client.say(chan, line.replace(re, ''));
+			} else if(command === "action") {
+				var chan = line.split(" ")[1];
+				var re = new RegExp('^action \\' + chan.replace(/\//,'\/') + " ");
+				client.action(chan, line.replace(re, ''));
+			} else if(command === "chans") {
+				stream.write('Joined to: ' + rc.channels.join(', ') + '\r\n');
+			} else if(command === "blist-add") {
+				var nnick = line.split(" ")[1];
+				rc.blist.push(nnick);
+			} else if(command === "blist-list") {
+				stream.write('Blacklisted: ' + rc.blnicks.join(', ') + '\r\n');
+			} else if(command === "join") {
+				console.log(line.replace(/^join /, ''));
+				client.join(line.replace(/^join /i, ''));
+			} else if(command === "part") {
+				try {
+					client.part(line.replace(/^part /i, '').trim());
+				} catch(e) {
+					console.log(e);
+				}
+			} else if(command === "help") {
+				stream.write('say - Says something on a channel\n' +
+				            'action - Does an action on a channel\n' +
+				            'chans - Lists channels the bot is on\n' +
+				            'blist-add - Temporarily adds a nick to the blacklist\n' +
+				            'blist-list - Lists all blacklisted nicks\n' +
+				            'join - Joins a channel\n' + 
+				            'part - Parts a channel\n' +
+				            'exit - Exits the chat\n');
+			} else if(command === "exit") {
+				stream.write('Bye\n');
+				stream.end();
+			}
+		});
+		stream.on('error', function(err) {
+			if(err) console.error(err);
+		});
+		stream.on('end', function() {
+			console.log('stream closed');
+		});
+	});
+	server.maxConnections = 1;
+	server.listen(DCCPORT);
+
+	client.ctcp(nick, 'privmsg', 'DCC CHAT CHAT ' + ip2int(address) + ' ' + DCCPORT);
+
+	DCCPORT++;	
 });
 
 app.configure(function() {
