@@ -165,31 +165,31 @@ client.addListener('message#', function(nick, target, text, message) {
 });
 
 client.addListener('pm', function(nick, text) {
-	if(!/^admin/i.test(text)) {
+	if(!/^admin/i.test(text)) { 
 		return null;
 	}
-	var interfaces = os.networkInterfaces();
+	var interfaces = os.networkInterfaces(); 
 	var addresses = [];
 	var address;
 	
-	for(var i in interfaces) {
-		if(interfaces[i].length !== 1) {
+	for(var i in interfaces) { // A shitty way of getting a good IP address to bind to
+		if(interfaces[i].length !== 1) { 
 			continue;
 		}
-		if(interfaces[i][0].family === 'IPv4' && !interfaces[i][0].internal) {
+		if(interfaces[i][0].family === 'IPv4' && !interfaces[i][0].internal) { // If it's IPv4 and not 127.0.0.1
 			addresses.push(interfaces[i][0].address);
 		}
 	}
 	
-	if(addresses.length === 1) {
+	if(addresses.length === 1) { // TODO: Fix this, for fucks sakes, fix this.
 		address = addresses[0];
 		console.log(address);
 	} else { 
-		client.say(nick, "There was an error binding to an address, attempting");
-		return console.warn('More than one IP address was found, could not bind.');
+		client.say(nick, "There was an error binding to an address, attempting"); // Yes, this is my dumb ass lying. 
+		return console.warn('More than one IP address was found, could not bind.'); // Yes, this is my dumb ass telling the truth
 	}
 	
-	if(DCCPORT > 65535) {
+	if(DCCPORT > 65535) { // Our DCCPORT goes up everytime we make a server, so lets check if it went over the max port number
 		DCCPORT = 55555;
 	}
 	var server = net.createServer(function(stream) {
@@ -201,10 +201,10 @@ client.addListener('pm', function(nick, text) {
 			stream.write('Enter your password: \r\n');
 		});
 		stream.on('data', function(line) {
-			if(times === 0) {
+			if(times === 0) { // First line
 				var hash1 = crypto.createHash('sha1'),
 				    hash2 = crypto.createHash('sha1');
-				if(hash1.update(line.trim()).digest('hex') === hash2.update(rc.passwd).digest('hex')) {
+				if(hash1.update(line.trim()).digest('hex') === hash2.update(rc.passwd).digest('hex')) { 
 					stream.write('Sucessfully logged in.\r\n');
 				} else {
 					stream.write('Error logging in. Closing socket.\r\n');
@@ -214,10 +214,10 @@ client.addListener('pm', function(nick, text) {
 				times++;
 				return;
 			}
-			var command = line.split(" ")[0];
+			var command = line.split(" ")[0]; 
 			if(command === "say") {
 				var chan = line.split(" ")[1];
-				var re = new RegExp('^say \\' + chan.replace(/\//,'\/') + " ");
+				var re = new RegExp('^say \\' + chan.replace(/\//,'\/') + " "); // This is honestly the first time I've used 'new Object()' for something Javascript normally provides
 				client.say(chan, line.replace(re, ''));
 			} else if(command === "action") {
 				var chan = line.split(" ")[1];
@@ -225,16 +225,15 @@ client.addListener('pm', function(nick, text) {
 				client.action(chan, line.replace(re, ''));
 			} else if(command === "chans") {
 				stream.write('Joined to: ' + rc.channels.join(', ') + '\r\n');
-			} else if(command === "blist-add") {
+			} else if(command === "blist-add") { // Temporarily add a nick to the nick blacklist
 				var nnick = line.split(" ")[1];
 				rc.blist.push(nnick);
 			} else if(command === "blist-list") {
 				stream.write('Blacklisted: ' + rc.blnicks.join(', ') + '\r\n');
 			} else if(command === "join") {
-				console.log(line.replace(/^join /, ''));
 				client.join(line.replace(/^join /i, ''));
 			} else if(command === "part") {
-				try {
+				try { // try {} catch() {} block: When you're too stupid to actually handle errors correctly
 					client.part(line.replace(/^part /i, '').trim());
 				} catch(e) {
 					console.log(e);
@@ -261,11 +260,11 @@ client.addListener('pm', function(nick, text) {
 		});
 	});
 	server.maxConnections = 1;
-	server.listen(DCCPORT);
+	server.listen(DCCPORT); // Listen
 
-	client.ctcp(nick, 'privmsg', 'DCC CHAT CHAT ' + ip2int(address) + ' ' + DCCPORT);
+	client.ctcp(nick, 'privmsg', 'DCC CHAT CHAT ' + ip2int(address) + ' ' + DCCPORT); // Send the DCC CHAT request
 
-	DCCPORT++;	
+	DCCPORT++;
 });
 
 app.configure(function() {
