@@ -224,7 +224,7 @@ client.addListener('pm', function(nick, text) {
 				var re = new RegExp('^action \\' + chan.replace(/\//,'\/') + " ");
 				client.action(chan, line.replace(re, ''));
 			} else if(command === "chans") {
-				stream.write('Joined to: ' + rc.channels.join(', ') + '\r\n');
+				stream.write('Joined to: ' + client.chans.join(', ') + '\r\n');
 			} else if(command === "blist-add") { // Temporarily add a nick to the nick blacklist
 				var nnick = line.split(" ")[1];
 				rc.blist.push(nnick);
@@ -274,7 +274,7 @@ app.configure(function() {
 
 app.post('/', function(req, res) {
 	var payload = JSON.parse(req.body.payload);
-	rc.channels.forEach(function(channel) {
+	client.chans.forEach(function(channel) {
 		client.say(channel, irc.colors.codes.light_gray + payload.repository.name + irc.colors.codes.reset + " (" + irc.colors.codes.light_blue + payload.repository.language + irc.colors.codes.reset + ") had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
 		payload.commits.forEach(function(commit) {
 			client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message.replace(/\n/gim, " ") + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset + " " + irc.colors.codes.light_blue + commit.url);
