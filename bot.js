@@ -227,7 +227,7 @@ client.addListener('pm', function(nick, text) {
 				stream.write('Joined to: ' + client.chans.join(', ') + '\r\n');
 			} else if(command === "blist-add") { // Temporarily add a nick to the nick blacklist
 				var nnick = line.split(" ")[1];
-				rc.blist.push(nnick);
+				rc.blnicks.push(nnick);
 			} else if(command === "blist-list") {
 				stream.write('Blacklisted: ' + rc.blnicks.join(', ') + '\r\n');
 			} else if(command === "join") {
