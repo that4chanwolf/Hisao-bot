@@ -238,6 +238,11 @@ client.addListener('pm', function(nick, text) {
 				} catch(e) {
 					console.log(e);
 				}
+			} else if(command === "announce") {
+				var message = line.replace(/^announce /,'');
+				client.chans.forEach(function(channel) {
+					client.say(channel, message + ' [' + nick + ']');
+				});
 			} else if(command === "help") {
 				stream.write('say - Says something on a channel\n' +
 				            'action - Does an action on a channel\n' +
