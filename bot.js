@@ -240,8 +240,8 @@ client.addListener('pm', function(nick, text) {
 				}
 			} else if(command === "announce") {
 				var message = line.replace(/^announce /,'');
-				client.chans.forEach(function(channel) {
-					client.say(channel, message + ' [' + nick + ']');
+				Object.keys(client.chans).forEach(function(channel) {
+					client.say(channel, message.trim() + ' [' + nick + ']');
 				});
 			} else if(command === "help") {
 				stream.write('say - Says something on a channel\n' +
