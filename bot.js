@@ -224,7 +224,7 @@ client.addListener('pm', function(nick, text) {
 				var re = new RegExp('^action \\' + chan.replace(/\//,'\/') + " ");
 				client.action(chan, line.replace(re, ''));
 			} else if(command === "chans") {
-				stream.write('Joined to: ' + client.chans.join(', ') + '\r\n');
+				stream.write('Joined to: ' + Object.keys(client.chans).join(', ') + '\r\n');
 			} else if(command === "blist-add") { // Temporarily add a nick to the nick blacklist
 				var nnick = line.split(" ")[1];
 				rc.blnicks.push(nnick);
