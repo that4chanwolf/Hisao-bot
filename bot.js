@@ -175,7 +175,7 @@ client.addListener('pm', function(nick, text) {
 		address = interfaces['eth0'].address;
 	} else {
 		client.say(nick, 'Unable to find an IP address to bind to');
-		return client.error('Unable to find a suitable IP address');
+		return console.error('Unable to find a suitable IP address');
 	}
 	
 	if(DCCPORT > 65535) { // Our DCCPORT goes up everytime we make a server, so lets check if it went over the max port number
