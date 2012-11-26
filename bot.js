@@ -169,24 +169,13 @@ client.addListener('pm', function(nick, text) {
 		return null;
 	}
 	var interfaces = os.networkInterfaces(); 
-	var addresses = [];
 	var address;
 	
-	for(var i in interfaces) { // A shitty way of getting a good IP address to bind to
-		if(interfaces[i].length !== 1) { 
-			continue;
-		}
-		if(interfaces[i][0].family === 'IPv4' && !interfaces[i][0].internal) { // If it's IPv4 and not 127.0.0.1
-			addresses.push(interfaces[i][0].address);
-		}
-	}
-	
-	if(addresses.length === 1) { // TODO: Fix this, for fucks sakes, fix this.
-		address = addresses[0];
-		console.log(address);
-	} else { 
-		client.say(nick, "There was an error binding to an address, attempting"); // Yes, this is my dumb ass lying. 
-		return console.warn('More than one IP address was found, could not bind.'); // Yes, this is my dumb ass telling the truth
+	if(typeof interfaces['eth0'] === 'undefined') { // Fuck everything
+		address = interfaces['eth0'].address;
+	} else {
+		client.say(nick, 'Unable to find an IP address to bind to');
+		return client.error('Unable to find a suitable IP address');
 	}
 	
 	if(DCCPORT > 65535) { // Our DCCPORT goes up everytime we make a server, so lets check if it went over the max port number
