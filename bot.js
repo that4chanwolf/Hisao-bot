@@ -171,7 +171,7 @@ client.addListener('pm', function(nick, text) {
 	var interfaces = os.networkInterfaces(); 
 	var address;
 	
-	if(typeof interfaces['eth0'] === 'undefined') { // Fuck everything
+	if(typeof interfaces['eth0'] !== 'undefined') { // Fuck everything
 		address = interfaces['eth0'].address;
 	} else {
 		client.say(nick, 'Unable to find an IP address to bind to');
