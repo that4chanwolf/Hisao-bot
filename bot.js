@@ -8,7 +8,8 @@ var irc = require('irc'),
     app = express(),
     rc = require('./rc'),
     client, responses = [], urls = {},
-    DCCPORT = 55555;
+    DCCPORT = 5555,
+    DCCMAX = 55554,
 
 var n = JSON.parse(fs.readFileSync(__dirname + '/responses.txt', 'utf8'));
 for( var i = 0; i < n.length; i++ ) {
@@ -178,8 +179,8 @@ client.addListener('pm', function(nick, text) {
 		return console.error('Unable to find a suitable IP address');
 	}
 	
-	if(DCCPORT > 65535) { // Our DCCPORT goes up everytime we make a server, so lets check if it went over the max port number
-		DCCPORT = 55555;
+	if(DCCPORT > DCCMAX) { // Our DCCPORT goes up everytime we make a server, so lets check if it went over the max our port number should be
+		DCCPORT = 5555;
 	}
 	var server = net.createServer(function(stream) {
 		stream.setEncoding('utf8');
