@@ -9,7 +9,7 @@ var irc = require('irc'),
     rc = require('./rc'),
     client, responses = [], urls = {},
     DCCPORT = 5555,
-    DCCMAX = 55554,
+    DCCMAX = 55554;
 
 var n = JSON.parse(fs.readFileSync(__dirname + '/responses.txt', 'utf8'));
 for( var i = 0; i < n.length; i++ ) {
