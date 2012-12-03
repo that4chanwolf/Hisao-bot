@@ -220,6 +220,12 @@ client.addListener('pm', function(nick, text) {
 				rc.blnicks.push(nnick);
 			} else if(command === "blist-list") {
 				stream.write('Blacklisted: ' + rc.blnicks.join(', ') + '\r\n');
+			} else if(command === "blist-rm") {
+				var rm = line.split(" ")[1];
+				if(typeof rm !== 'undefined' && rc.blnicks[rc.blnicks.indexOf(rm)] !== -1) {
+					delete rc.blnicks[rc.blnicks.indexOf(rm)];
+					stream.write('Nick successfully removed.\n');
+				}
 			} else if(command === "join") {
 				client.join(line.replace(/^join /i, ''));
 			} else if(command === "part") {
@@ -239,8 +245,10 @@ client.addListener('pm', function(nick, text) {
 				            'chans - Lists channels the bot is on\n' +
 				            'blist-add - Temporarily adds a nick to the blacklist\n' +
 				            'blist-list - Lists all blacklisted nicks\n' +
+				            'blist-rm - Remove a nick from the blacklist\n'
 				            'join - Joins a channel\n' + 
 				            'part - Parts a channel\n' +
+				            'announce - Says something to every channel ' + rc.nick + ' is on\n' +
 				            'exit - Exits the chat\n');
 			} else if(command === "exit") {
 				stream.write('Bye\n');
