@@ -245,7 +245,7 @@ client.addListener('pm', function(nick, text) {
 				            'chans - Lists channels the bot is on\n' +
 				            'blist-add - Temporarily adds a nick to the blacklist\n' +
 				            'blist-list - Lists all blacklisted nicks\n' +
-				            'blist-rm - Remove a nick from the blacklist\n'
+				            'blist-rm - Remove a nick from the blacklist\n' +
 				            'join - Joins a channel\n' + 
 				            'part - Parts a channel\n' +
 				            'announce - Says something to every channel ' + rc.nick + ' is on\n' +
