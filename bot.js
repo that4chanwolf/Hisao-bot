@@ -32,6 +32,39 @@ var ip2int = function(dotted) { // Takes an IP adress and turns it into the form
 	return intip;
 }
 
+String.prototype.autism = function () { // Autism.jpeg
+  var parens = 0,
+	    ticks = 0,
+	    quotes = 0,
+	    line = this.valueOf();
+	for (var i = 0; i < line.length; i++) {
+		if (line[i] === '(') { // Parens
+			parens++;
+		} else if (line[i] === ')') {
+			parens--;
+		}
+		if (line[i] === "'") { // Ticks
+			if (ticks % 2 === 0) { // Equal amoutnt of ticks
+				ticks++;
+			} else {
+				ticks--;
+			}
+		}
+		if (line[i] === '"') { // Quotes
+			if (quotes % 2 === 0) { // Equal amount of quotes
+				quotes++;
+			} else { // Odd amount of quotes
+				quotes--;
+			}
+		}
+	}
+	line = line + 
+		Array(parens+1).join(')') +
+		Array(ticks+1).join("'") +
+		Array(quotes+1).join('"');
+	return line;
+}
+
 client = new irc.Client(rc.network, rc.nick, {
 	userName: rc.user,
 	realName: rc.real,
@@ -45,24 +78,44 @@ client.addListener('registered', function() {
 	}
 });
 
-var writeInterval = setInterval(function() {
-	fs.writeFile('responses.txt', JSON.stringify(responses), function(err) {
-		if(err) {
-			throw err;
+var refresh = setInterval(function() {
+	fs.writeFile('responses.txt', JSON.stringify(responses), function(fsErr) {
+		if(fsErr) {
+			throw fsErr;
 		} else {
 			console.log("Responses saved!");
+			fs.writeFile('urls.txt', JSON.stringify(urls, null, "\t"), function(urlErr) {
+				if(urlErr) {
+					throw urlErr;
+				} else {
+					console.log("URLs saved");
+					try {
+						delete require.cache[require.resolve('./rc');
+						fs.writeFile('rc.js', "modules.exports = " + JSON.stringify(rc, null, "\t"), function(fsErr2) {
+							if(fsErr2) {
+								throw fsErr2;
+							} else {
+								rc = require('./rc');
+								console.log("Reloaded the configuration file");
+							}
+						});
+					} catch(rcErr) {
+						throw rcErr;
+					}
+				}
+			});
 		}
 	});
-	fs.writeFile('urls.txt', JSON.stringify(urls, null, "\t"), function(err) {
-		if(err) {
-			throw err;
-		} else {
-			console.log("URLs saved");
-		}
-	});
-}, 50000);
+}, 600000);
 
-client.addListener('message#', function(nick, target, text, message) {
+client.addListener('nick', function(onick, nnick, channels) { // Blacklist
+	if(rc.blnicks.indexOf(onick) === -1) {
+		return;
+	}
+	rc.blnicks.push(nnick);
+});
+
+client.addListener('message#', function(nick, target, text, message) { // CAPS LOCK IS CRUISE CONTROL FOR COOL
 	console.log(nick, target, text);
 	if(text.toUpperCase() !== text || !/[A-Z]/.test(text) || !(text.length > 6) || rc.blnicks.indexOf(nick) !== -1 ) {
 		return;
@@ -78,14 +131,13 @@ client.addListener('message#', function(nick, target, text, message) {
 	responses.push(text);
 });
 
-client.addListener('nick', function(onick, nnick, channels) {
-	if(rc.blnicks.indexOf(onick) === -1) {
-		return;
+client.addListener('message#', function(nick, target, text, message) { // AUTISM
+	if(text !== text.autism()) {
+		return client.say(target, "What " + nick + " meant to say was: `" + text.autism() + "`");
 	}
-	rc.blnicks.push(nnick);
 });
 
-client.addListener('message#', function(nick, target, text, message) {
+client.addListener('message#', function(nick, target, text, message) { // Normal functions
 	if(rc.blnicks.indexOf(nick) !== -1) {
 		return;
 	}
