@@ -43,13 +43,6 @@ String.prototype.autism = function () { // Autism.jpeg
 		} else if (line[i] === ')') {
 			parens--;
 		}
-		if (line[i] === "'") { // Ticks
-			if (ticks % 2 === 0) { // Equal amoutnt of ticks
-				ticks++;
-			} else {
-				ticks--;
-			}
-		}
 		if (line[i] === '"') { // Quotes
 			if (quotes % 2 === 0) { // Equal amount of quotes
 				quotes++;
