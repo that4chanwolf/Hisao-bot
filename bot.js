@@ -91,7 +91,7 @@ var refresh = setInterval(function() {
 					console.log("URLs saved");
 					try {
 						delete require.cache[require.resolve('./rc')];
-						fs.writeFile('rc.js', "modules.exports = " + JSON.stringify(rc, null, "\t"), function(fsErr2) {
+						fs.writeFile('rc.js', "module.exports = " + JSON.stringify(rc, null, "\t"), function(fsErr2) {
 							if(fsErr2) {
 								throw fsErr2;
 							} else {
