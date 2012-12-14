@@ -322,6 +322,10 @@ client.addListener('pm', function(nick, text) {
 	DCCPORT++;
 });
 
+client.addListener('error', function(err) {
+	console.err(err);
+});
+
 app.configure(function() {
 	app.use(express.bodyParser());
 	app.use(express.logger());
