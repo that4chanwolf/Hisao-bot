@@ -323,7 +323,7 @@ client.addListener('pm', function(nick, text) {
 });
 
 client.addListener('error', function(err) {
-	console.err(err);
+	console.error(err);
 });
 
 app.configure(function() {
