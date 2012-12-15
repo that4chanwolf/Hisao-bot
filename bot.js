@@ -34,7 +34,6 @@ var ip2int = function(dotted) { // Takes an IP adress and turns it into the form
 
 String.prototype.autism = function () { // Autism.jpeg
   var parens = 0,
-	    ticks = 0,
 	    quotes = 0,
 	    line = this.valueOf();
 	for (var i = 0; i < line.length; i++) {
@@ -53,7 +52,6 @@ String.prototype.autism = function () { // Autism.jpeg
 	}
 	line = line + 
 		Array(parens+1).join(')') +
-		Array(ticks+1).join("'") +
 		Array(quotes+1).join('"');
 	return line;
 }
