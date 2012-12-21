@@ -122,11 +122,11 @@ client.addListener('message#', function(nick, target, text, message) { // CAPS L
 	responses.push(text);
 });
 
-client.addListener('message#', function(nick, target, text, message) { // AUTISM
+/*client.addListener('message#', function(nick, target, text, message) { // AUTISM
 	if(text !== text.autism()) {
 		return client.say(target, "What " + nick + " meant to say was: `" + text.autism() + "`");
 	}
-});
+});/**/
 
 client.addListener('message#', function(nick, target, text, message) { // Normal functions
 	if(rc.blnicks.indexOf(nick) !== -1) {
