@@ -325,7 +325,7 @@ app.configure(function() {
 app.post('/', function(req, res) {
 	var payload = JSON.parse(req.body.payload);
 	Object.keys(client.chans).forEach(function(channel) {
-		client.say(channel, irc.colors.codes.light_gray + payload.repository.name + irc.colors.codes.reset + " (" + irc.colors.codes.light_blue + payload.repository.language + irc.colors.codes.reset + ") had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
+		client.say(channel, irc.colors.codes.light_gray + payload.repository.name +irc.colors.codes.reset + " had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
 		payload.commits.forEach(function(commit) {
 			client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message.replace(/\n/gim, " ") + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset + " " + irc.colors.codes.light_blue + commit.url);
 		});
