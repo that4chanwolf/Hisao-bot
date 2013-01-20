@@ -323,6 +323,12 @@ app.configure(function() {
 });
 
 app.post('/', function(req, res) {
+	if( [
+		"207.97.227.253",
+		"50.57.128.197",
+		"108.171.174.178",
+		"50.57.231.61"
+	].indexOf(req.connection.remoteAddress) === -1 || req.headers['X-Github-Event'] !== 'push') return;
 	var payload = JSON.parse(req.body.payload);
 	Object.keys(client.chans).forEach(function(channel) {
 		client.say(channel, irc.colors.codes.light_gray + payload.repository.name + (typeof payload.repository.language === "undefined" ? "" : "(" + irc.colors.codes.light_blue + payload.repository.language + irc.colors.codes.reset + ")" ) + irc.colors.codes.reset + " had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
