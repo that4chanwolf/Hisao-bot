@@ -100,7 +100,7 @@ var refresh = setInterval(function() {
 }, 600000);
 
 client.addListener('nick', function(onick, nnick, channels) { // Blacklist
-	if(rc.blnicks.indexOf(onick) === -1) {
+	if(rc.blnicks.indexOf(onick) !== -1) {
 		return;
 	}
 	rc.blnicks.push(nnick);
