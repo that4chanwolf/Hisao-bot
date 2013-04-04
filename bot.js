@@ -5,6 +5,7 @@ var irc = require('irc'),
     crypto = require('crypto'),
     request = require('request'),
     express = require('express'),
+    format = require('format'),
     app = express(),
     rc = require('./rc'),
     client, responses = [], urls = {},
@@ -132,11 +133,11 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 	if(rc.blnicks.indexOf(nick) !== -1) {
 		return;
 	}
-	if(/^\.bots/.test(text)) {
+	if(/^\.bots/.test(text)) { // Reporting in as a bot
 		client.say(target, "Reporting in!");
 		return;
 	}
-	if(/^\.shorten/.test(text)) {
+	if(/^\.shorten/.test(text)) { // URL shortening with waa.ai
 		var url = text.split(" ")[1]
 		if(typeof urls[url] === "undefined") {
 			request("http://waa.ai/api.php?url=" + url, function(e,r,b) {
@@ -151,7 +152,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		}
 		return;
 	}
-	if(/^\.gh/.test(text)) {
+	if(/^\.gh/.test(text)) { // Shows a user's github repositories
 		var user = text.split(" ")[1];
 		if(typeof user === "undefined") {
 			client.say(target, nick + ": Fuck you.")
@@ -179,7 +180,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		});
 		return;
 	}
-	if(/^\.nyaa/.test(text)) {
+	if(/^\.nyaa/.test(text)) { // Nyaa.eu searching
 		var term = text.replace(/^\.nyaa/, '').replace(/ /gi, escape(escape(" ")));
 		request("http://query.yahooapis.com/v1/public/yql?format=json&diagnostics=false&q=select%20*%20from%20feed%20where%20url%3D'http%3A%2F%2Fwww.nyaa.eu%2F%3Fpage%3Drss%26filter%3D1%26term%3D" + term + "'", function(e,r,b) {
 			var json,
@@ -203,6 +204,25 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 					return;
 				}
 			}
+		});
+		return;
+	}
+	if(/^\.(?:btc|bitcoin(?:s)|buttcoin(?:s))/.test(text)) {
+		request("http://data.mtgox.com/api/2/BTCUSD/money/ticker", function(e, r, b) {
+			var string;
+			if(e) {
+				client.say(channel, "ERROR: " + e);
+			}
+			try {
+				JSON.parse(b);
+			} catch(err) {
+				return client.say(channel, "ERROR: Error parsing response, probably not in JSON format.");
+			}
+			
+			var buttcoins = JSON.parse(b)["data"];
+			var colors = irc.colors.codes;
+			string = format("%sHigh: %s%s | %sLow: %s%s | %sAverage: %s%s", colors.light_green, colors.reset, buttcoins["high"]["display_short"], colors.light_red, colors.reset, buttcoins["low"]["display_short"], colors.light_blue, colors.reset, buttcoins["avg"]["display_short"]);
+			client.say(channel, string);
 		});
 		return;
 	}
