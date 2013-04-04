@@ -160,20 +160,19 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		}
 		request("https://api.github.com/users/" + user + "/repos", function(e,r,b) {
 			var json = JSON.parse(b),
-			    index, repo,
-			    channel = target;
+			    index, repo;
 			if(typeof json.length === "undefined") {
-				client.say(channel, "User does not exist");
+				client.say(target, "User does not exist");
 				console.log(json);
 				return;
 			}
-			client.say(channel, irc.colors.codes.light_gray + user + irc.colors.codes.reset + " has " + irc.colors.codes.light_red + json.length + irc.colors.codes.reset + " repos.");
+			client.say(target, irc.colors.codes.light_gray + user + irc.colors.codes.reset + " has " + irc.colors.codes.light_red + json.length + irc.colors.codes.reset + " repos.");
 			for(index = 0; index < json.length; index++) {
 				repo = json[index];
 				if(index < 3) {
-					client.say(channel, irc.colors.codes.light_magenta + repo.name + irc.colors.codes.reset + " " + " " + repo.description.trim() + " (" + irc.colors.codes.light_blue + ( repo.language !== null ? repo.language : "None" ) + irc.colors.codes.reset + ")");
+					client.say(target, irc.colors.codes.light_magenta + repo.name + irc.colors.codes.reset + " " + " " + repo.description.trim() + " (" + irc.colors.codes.light_blue + ( repo.language !== null ? repo.language : "None" ) + irc.colors.codes.reset + ")");
 				} else {
-					client.say(channel, "...and " + irc.colors.codes.light_red + (json.length - 3) + irc.colors.codes.reset + " more!");
+					client.say(target, "...and " + irc.colors.codes.light_red + (json.length - 3) + irc.colors.codes.reset + " more!");
 					return;
 				}
 			}
@@ -211,18 +210,18 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		request("http://data.mtgox.com/api/2/BTCUSD/money/ticker", function(e, r, b) {
 			var string;
 			if(e) {
-				client.say(channel, "ERROR: " + e);
+				client.say(target, "ERROR: " + e);
 			}
 			try {
 				JSON.parse(b);
 			} catch(err) {
-				return client.say(channel, "ERROR: Error parsing response, probably not in JSON format.");
+				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
 			}
 			
 			var buttcoins = JSON.parse(b)["data"];
 			var colors = irc.colors.codes;
 			string = format("%sHigh: %s%s | %sLow: %s%s | %sAverage: %s%s", colors.light_green, colors.reset, buttcoins["high"]["display_short"], colors.light_red, colors.reset, buttcoins["low"]["display_short"], colors.light_blue, colors.reset, buttcoins["avg"]["display_short"]);
-			client.say(channel, string);
+			client.say(target, string);
 		});
 		return;
 	}
