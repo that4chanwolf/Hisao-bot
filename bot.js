@@ -231,35 +231,6 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		});
 		return;
 	}
-	if(/^\.(?:ltc|litecoin(?:s?)|kikecoin(?:s?))/.test(text)) {
-		request("https://www.litecoinglobal.com/api/ticker/LTC-GLOBAL", function(e, r, b) {
-			var string;
-			if(e) {
-				client.say(target, "ERROR: " + e);
-			}
-			try {
-				JSON.parse(b);
-			} catch(err) {
-				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
-			}
-			var tmp = JSON.parse(b);
-			kikecoins = {
-				high: tmp["24h_high"],
-				low: tmp["24h_low"],
-				avg: tmp["24h_avg"]
-			};
-			var colors = irc.colors.codes;
-			string = format("%sHigh: %s$%s | %sLow: %s$%s | %Average: %s$%s",
-				colors.light_green, colors.reset,
-				kikecoins["high"],
-				colors.light_red, colors.reset,
-				kikecoins["low"],
-				colors.light_blue, colors.reset,
-				kikecoins["avg"]);
-			client.say(target, string);
-		});
-		return;
-	}
 });
 
 client.addListener('pm', function(nick, text) {
