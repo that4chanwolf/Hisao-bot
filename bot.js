@@ -206,7 +206,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		});
 		return;
 	}
-	if(/^\.(?:btc|bitcoin(?:s)|buttcoin(?:s))/.test(text)) {
+	if(/^\.(?:btc|bitcoin(?:s?)|buttcoin(?:s?))/.test(text)) {
 		request("http://data.mtgox.com/api/2/BTCUSD/money/ticker", function(e, r, b) {
 			var string;
 			if(e) {
@@ -220,7 +220,42 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 			
 			var buttcoins = JSON.parse(b)["data"];
 			var colors = irc.colors.codes;
-			string = format("%sHigh: %s%s | %sLow: %s%s | %sAverage: %s%s", colors.light_green, colors.reset, buttcoins["high"]["display_short"], colors.light_red, colors.reset, buttcoins["low"]["display_short"], colors.light_blue, colors.reset, buttcoins["avg"]["display_short"]);
+			string = format("%sHigh: %s%s | %sLow: %s%s | %sAverage: %s%s", 
+				colors.light_green, colors.reset, 
+				buttcoins["high"]["display_short"], 
+				colors.light_red, colors.reset, 
+				buttcoins["low"]["display_short"], 
+				colors.light_blue, colors.reset, 
+				buttcoins["avg"]["display_short"]);
+			client.say(target, string);
+		});
+		return;
+	}
+	if(/^\.(?:ltc|litecoin(?:s?)|kikecoin(?:s?))/.test(text)) {
+		request("https://www.litecoinglobal.com/api/ticker/LTC-GLOBAL", function(e, r, b) {
+			var string;
+			if(e) {
+				client.say(target, "ERROR: " + e);
+			}
+			try {
+				JSON.parse(b);
+			} catch(err) {
+				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
+			}
+			var tmp = JSON.parse(b);
+			kikecoins = {
+				high: tmp["24h_high"],
+				low: tmp["24h_low"],
+				avg: tmp["24h_avg"]
+			};
+			var colors = irc.colors.codes;
+			string = format("%sHigh: %s$%s | %sLow: %s$%s | %Average: %s$%s",
+				colors.light_green, colors.reset
+				kikecoins["high"],
+				colors.light_red, colors.reset,
+				kikecoins["low"],
+				colors.light_blue, colors.reset,
+				kikecoins["avg"]);
 			client.say(target, string);
 		});
 		return;
