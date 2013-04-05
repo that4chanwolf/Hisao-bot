@@ -9,5 +9,7 @@ module.exports = {
 	"blnicks": [
 	],
 	"ns": '',
-	"passwd": ''
+	"passwd": '',
+	"dcc": true,
+	"git": false
 }

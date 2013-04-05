@@ -234,7 +234,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 });
 
 client.addListener('pm', function(nick, text) {
-	if(!/^admin/i.test(text)) { 
+	if(!/^admin/i.test(text) || !rc.dcc) { 
 		return null;
 	}
 	var interfaces = os.networkInterfaces(); 
@@ -341,27 +341,29 @@ client.addListener('pm', function(nick, text) {
 client.addListener('error', function(err) {
 	console.error(err);
 });
+(function() {
+	if(!rc.git) return;
 
-app.configure(function() {
-	app.use(express.bodyParser());
-	app.use(express.logger());
-});
+	app.configure(function() {
+		app.use(express.bodyParser());
+		app.use(express.logger());
+	});
 
-app.post('/', function(req, res) {
-	if( [
-		"207.97.227.253",
-		"50.57.128.197",
-		"108.171.174.178",
-		"50.57.231.61"
-	].indexOf(req.connection.remoteAddress) === -1 || req.headers['X-Github-Event'] !== 'push') return;
-	var payload = JSON.parse(req.body.payload);
-	Object.keys(client.chans).forEach(function(channel) {
-		client.say(channel, irc.colors.codes.light_gray + payload.repository.name + (typeof payload.repository.language === "undefined" ? "" : " (" + irc.colors.codes.light_blue + payload.repository.language + irc.colors.codes.reset + ")" ) + irc.colors.codes.reset + " had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
-		payload.commits.forEach(function(commit) {
-			client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message.replace(/\n/gim, " ") + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset + " " + irc.colors.codes.light_blue + commit.url);
+	app.post('/', function(req, res) {
+		if( [
+			"207.97.227.253",
+			"50.57.128.197",
+			"108.171.174.178",
+			"50.57.231.61"
+		].indexOf(req.connection.remoteAddress) === -1 || req.headers['X-Github-Event'] !== 'push') return;
+		var payload = JSON.parse(req.body.payload);
+		Object.keys(client.chans).forEach(function(channel) {
+			client.say(channel, irc.colors.codes.light_gray + payload.repository.name + (typeof payload.repository.language === "undefined" ? "" : " (" + irc.colors.codes.light_blue + payload.repository.language + irc.colors.codes.reset + ")" ) + irc.colors.codes.reset + " had " + payload.commits.length + " commit" + ( payload.commits.length > 1 ? "s" : "" ) + " added.");
+			payload.commits.forEach(function(commit) {
+				client.say(channel, irc.colors.codes.light_magenta + "[" + commit.author.name + "]" + irc.colors.codes.reset + " " + commit.message.replace(/\n/gim, " ") + " " + irc.colors.codes.light_green + "[" + payload.ref.split('/')[payload.ref.split("/").length-1] + "]" + irc.colors.codes.reset + " " + irc.colors.codes.light_blue + commit.url);
+			});
 		});
 	});
-});
 
-
-app.listen(8181);
+	app.listen(8181);
+}).call(this);
