@@ -250,7 +250,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 			};
 			var colors = irc.colors.codes;
 			string = format("%sHigh: %s$%s | %sLow: %s$%s | %Average: %s$%s",
-				colors.light_green, colors.reset
+				colors.light_green, colors.reset,
 				kikecoins["high"],
 				colors.light_red, colors.reset,
 				kikecoins["low"],
