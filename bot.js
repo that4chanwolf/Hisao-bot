@@ -207,10 +207,10 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		return;
 	}
 	if(/^\.(?:btc|bitcoin(?:s?)|buttcoin(?:s?))/.test(text)) {
-		request("http://data.mtgox.com/api/2/BTCUSD/money/ticker", function(e, r, b) {
+		request("https://btc-e.com/api/2/btc_usd/ticker", function(e, r, b) {
 			var string;
 			if(e) {
-				client.say(target, "ERROR: " + e);
+				return client.say(target, "ERROR: " + e);
 			}
 			try {
 				JSON.parse(b);
@@ -218,15 +218,39 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
 			}
 			
-			var buttcoins = JSON.parse(b)["data"];
+			var buttcoins = JSON.parse(b)["ticker"];
 			var colors = irc.colors.codes;
-			string = format("%sHigh: %s%s | %sLow: %s%s | %sAverage: %s%s", 
+			string = format("%sHigh: %s$%s | %sLow: %s$%s | %sAverage: %s$%s", 
 				colors.light_green, colors.reset, 
-				buttcoins["high"]["display_short"], 
+				buttcoins["high"], 
 				colors.light_red, colors.reset, 
-				buttcoins["low"]["display_short"], 
+				buttcoins["low"], 
 				colors.light_blue, colors.reset, 
-				buttcoins["avg"]["display_short"]);
+				buttcoins["avg"]);
+			client.say(target, string);
+		});
+		return;
+	}
+	if(/^\.(?:ltc|litecoin(?:s?)|kikecoin(?:s?))/.test(text)) {
+		request("https://btc-e.com/api/2/ltc_usd/ticker", function(e, r, b) {
+			var string;
+			if(e) {
+				return client.say(target, "ERROR: " + e);
+			}
+			try {
+				JSON.parse(b);
+			} catch(err) {
+				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
+			}
+			var kikecoins = JSON.parse(b)["ticker"];
+			var colors = irc.colors.codes;
+			string = format("%sHigh: %s$%s | %sLow: %s$%s | %sAverage: %s$%s", 
+				colors.light_green, colors.reset, 
+				kikecoins["high"], 
+				colors.light_red, colors.reset, 
+				kikecoins["low"], 
+				colors.light_blue, colors.reset, 
+				kikecoins["avg"]);
 			client.say(target, string);
 		});
 		return;
