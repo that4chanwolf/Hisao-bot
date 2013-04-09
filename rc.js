@@ -6,8 +6,12 @@ module.exports = {
 		"#nyaa-nyaa",
 		"#your-shitty-channel"
 	],
-	"blnicks": [
-	],
+	"chatmute": [
+		"#your-shitty-channel"
+	]
+	"functionmute": [
+		"#nyaa-nyaa"
+	]
 	"ns": '',
 	"passwd": '',
 	"dcc": true,

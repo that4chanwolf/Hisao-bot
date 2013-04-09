@@ -100,15 +100,11 @@ var refresh = setInterval(function() {
 	});
 }, 600000);
 
-client.addListener('nick', function(onick, nnick, channels) { // Blacklist
-	if(rc.blnicks.indexOf(onick) !== -1) {
-		return;
-	}
-	rc.blnicks.push(nnick);
-});
-
 client.addListener('message#', function(nick, target, text, message) { // CAPS LOCK IS CRUISE CONTROL FOR COOL
 	console.log(nick, target, text);
+	
+	if(typeof rc.chatmute[target] !== "undefined" || rc.chatmute[target] !== null) return;
+	
 	if(text.toUpperCase() !== text || !/[A-Z]/.test(text) || !(text.length > 6) || rc.blnicks.indexOf(nick) !== -1 ) {
 		return;
 	}
@@ -130,9 +126,8 @@ client.addListener('message#', function(nick, target, text, message) { // CAPS L
 });/**/
 
 client.addListener('message#', function(nick, target, text, message) { // Normal functions
-	if(rc.blnicks.indexOf(nick) !== -1) {
-		return;
-	}
+	if(typeof rc.functionmute[target] !== "undefined" || rc.functionmute[target] !== null) return;
+
 	if(/^\.bots/.test(text)) { // Reporting in as a bot
 		client.say(target, "Reporting in!");
 		return;
@@ -259,7 +254,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 
 client.addListener('pm', function(nick, text) {
 	if(!/^admin/i.test(text) || !rc.dcc) { 
-		return null;
+		return;
 	}
 	var interfaces = os.networkInterfaces(); 
 	var address;
@@ -307,17 +302,22 @@ client.addListener('pm', function(nick, text) {
 				client.action(chan, line.replace(re, ''));
 			} else if(command === "chans") {
 				stream.write('Joined to: ' + Object.keys(client.chans).join(', ') + '\r\n');
-			} else if(command === "blist-add") { // Temporarily add a nick to the nick blacklist
-				var nnick = line.split(" ")[1];
-				rc.blnicks.push(nnick);
-			} else if(command === "blist-list") {
-				stream.write('Blacklisted: ' + rc.blnicks.join(', ') + '\r\n');
-			} else if(command === "blist-rm") {
-				var rm = line.split(" ")[1];
-				if(typeof rm !== 'undefined' && rc.blnicks[rc.blnicks.indexOf(rm)] !== -1) {
-					delete rc.blnicks[rc.blnicks.indexOf(rm)];
-					stream.write('Nick successfully removed.\n');
-				}
+			} else if(command === "mute") {
+				var type = line.split(" ")[1].trim(),
+				    mutechan = line.split(" ")[2].trim();
+				
+				type = ( type === "functions" ? "functionmute" : "chatmute" );
+				
+				rc[type].push(mutechan);
+			} else if(command == "unmute") {
+				var type = line.split(" ")[1];
+				    unmutechan = line.split(" ")[2];
+				
+				type = ( type === "functions" ? "functionmute" : "chatmute" );
+				
+				if(rc[type].indexOf(unmutechan) === -1) return;
+				
+				delete rc[type][ rc[type].indexOf(unmutechan) ];
 			} else if(command === "join") {
 				client.join(line.replace(/^join /i, ''));
 			} else if(command === "part") {
@@ -335,9 +335,8 @@ client.addListener('pm', function(nick, text) {
 				stream.write('say - Says something on a channel\n' +
 				            'action - Does an action on a channel\n' +
 				            'chans - Lists channels the bot is on\n' +
-				            'blist-add - Temporarily adds a nick to the blacklist\n' +
-				            'blist-list - Lists all blacklisted nicks\n' +
-				            'blist-rm - Remove a nick from the blacklist\n' +
+				            'mute - Mutes non-command output for a channel\n' +
+				            'unmute - Unmutes non-command output for a channel\n' +
 				            'join - Joins a channel\n' + 
 				            'part - Parts a channel\n' +
 				            'announce - Says something to every channel ' + rc.nick + ' is on\n' +
