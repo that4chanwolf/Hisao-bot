@@ -103,7 +103,7 @@ var refresh = setInterval(function() {
 client.addListener('message#', function(nick, target, text, message) { // CAPS LOCK IS CRUISE CONTROL FOR COOL
 	console.log(nick, target, text);
 	
-	if(typeof rc.chatmute[target] !== "undefined" || rc.chatmute[target] !== null) return;
+	if(rc.chatmute.indexOf(target) !== -1) return;
 	
 	if(text.toUpperCase() !== text || !/[A-Z]/.test(text) || !(text.length > 6) || rc.blnicks.indexOf(nick) !== -1 ) {
 		return;
@@ -126,7 +126,7 @@ client.addListener('message#', function(nick, target, text, message) { // CAPS L
 });/**/
 
 client.addListener('message#', function(nick, target, text, message) { // Normal functions
-	if(typeof rc.functionmute[target] !== "undefined" || rc.functionmute[target] !== null) return;
+	if(rc.functionmute.indexOf(target) !== -1) return;
 
 	if(/^\.bots/.test(text)) { // Reporting in as a bot
 		client.say(target, "Reporting in!");
@@ -176,10 +176,9 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 	}
 	if(/^\.nyaa/.test(text)) { // Nyaa.eu searching
 		var term = text.replace(/^\.nyaa/, '').replace(/ /gi, escape(escape(" ")));
-		request(format(
-			"http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20rss%20where%20url%3D%22http%3A%2F%2Fwww.nyaa.eu%2F%3Fpage%3Drss%26filter%3D1%26term%3D" + "%s" + "%22&format=json&callback=",
-			term
-		), function(e,r,b) {
+		request(
+			"http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20rss%20where%20url%3D%22http%3A%2F%2Fwww.nyaa.eu%2F%3Fpage%3Drss%26filter%3D1%26term%3D" + term + "%22&format=json&callback=",
+		function(e,r,b) {
 			var json,
 			    item;
 			try {
