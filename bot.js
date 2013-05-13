@@ -176,7 +176,10 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 	}
 	if(/^\.nyaa/.test(text)) { // Nyaa.eu searching
 		var term = text.replace(/^\.nyaa/, '').replace(/ /gi, escape(escape(" ")));
-		request("http://query.yahooapis.com/v1/public/yql?format=json&diagnostics=false&q=select%20*%20from%20feed%20where%20url%3D'http%3A%2F%2Fwww.nyaa.eu%2F%3Fpage%3Drss%26filter%3D1%26term%3D" + term + "'", function(e,r,b) {
+		request(format(
+			"http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20rss%20where%20url%3D%22http%3A%2F%2Fwww.nyaa.eu%2F%3Fpage%3Drss%26filter%3D1%26term%3D" + "%s" + "%22&format=json&callback=",
+			term
+		), function(e,r,b) {
 			var json,
 			    item;
 			try {
