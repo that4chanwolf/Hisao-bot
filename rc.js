@@ -8,10 +8,10 @@ module.exports = {
 	],
 	"chatmute": [
 		"#your-shitty-channel"
-	]
+	],
 	"functionmute": [
 		"#nyaa-nyaa"
-	]
+	],
 	"ns": '',
 	"passwd": '',
 	"dcc": true,
