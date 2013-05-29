@@ -105,7 +105,7 @@ client.addListener('message#', function(nick, target, text, message) { // CAPS L
 	
 	if(rc.chatmute.indexOf(target) !== -1) return;
 	
-	if(text.toUpperCase() !== text || !/[A-Z]/.test(text) || !(text.length > 6) || rc.blnicks.indexOf(nick) !== -1 ) {
+	if(text.toUpperCase() !== text || !/[A-Z]/.test(text) || !(text.length > 6)) {
 		return;
 	}
 	for (var i = 0, n = text.length; i < n; i++) {
