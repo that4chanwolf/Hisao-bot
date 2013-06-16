@@ -153,7 +153,9 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 			client.say(target, nick + ": Fuck you.")
 			return;
 		}
-		request("https://api.github.com/users/" + user + "/repos", function(e,r,b) {
+		request({
+			"User-Agent": "Hisao-bot <3s GitHub"
+		}, "https://api.github.com/users/" + user + "/repos", function(e,r,b) {
 			var json = JSON.parse(b),
 			    index, repo;
 			if(typeof json.length === "undefined") {
