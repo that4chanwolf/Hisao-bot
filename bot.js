@@ -206,7 +206,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		return;
 	}
 	if(/^\.(?:btc|bitcoin(?:s?)|buttcoin(?:s?))/.test(text)) {
-		request("https://btc-e.com/api/2/btc_usd/ticker", function(e, r, b) {
+		request("https://mtgox.com/api/1/BTCUSD/public/ticker", function(e, r, b) {
 			var string;
 			if(e) {
 				return client.say(target, "ERROR: " + e);
@@ -217,15 +217,17 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
 			}
 			
-			var buttcoins = JSON.parse(b)["ticker"];
+			var buttcoins = JSON.parse(b)["return"];
 			var colors = irc.colors.codes;
-			string = format("%sHigh: %s$%s | %sLow: %s$%s | %sAverage: %s$%s", 
+			string = format("%sHigh: %s%s | %sLow: %s%s | %sLast: %s%s | %sAverage: %s%s", 
 				colors.light_green, colors.reset, 
-				buttcoins["high"], 
+				buttcoins["high"]["display"], 
 				colors.light_red, colors.reset, 
-				buttcoins["low"], 
-				colors.light_blue, colors.reset, 
-				buttcoins["avg"]);
+				buttcoins["low"]["display"], 
+				colors.light_magenta, colors.reset, 
+				buttcoins["last"]["display"],
+				colors.light_blue, colors.reset,
+				buttcoins["avg"]["display"]);
 			client.say(target, string);
 		});
 		return;
