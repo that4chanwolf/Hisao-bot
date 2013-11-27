@@ -259,7 +259,8 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		return;
 	}
 	if(/^\.(?:source|src)/.test(text)) {
-		return client.say(target, "Hisao-bot source: https://github.com/that4chanwolf/Hisao-bot"
+		return client.say(target, "Hisao-bot source: 
+https://github.com/that4chanwolf/Hisao-bot");
 	}
 });
 
