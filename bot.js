@@ -245,11 +245,13 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 			}
 			var kikecoins = JSON.parse(b)["ticker"];
 			var colors = irc.colors.codes;
-			string = format("%sHigh: %s$%s | %sLow: %s$%s | %sAverage: %s$%s", 
+			string = format("%sHigh: %s$%s | %sLow: %s$%s | %sLast: %s$%s | %sAverage: %s$%s", 
 				colors.light_green, colors.reset, 
 				kikecoins["high"], 
 				colors.light_red, colors.reset, 
 				kikecoins["low"], 
+				colors.light_magenta, colors.reset,
+				kikecoins["last"],
 				colors.light_blue, colors.reset, 
 				kikecoins["avg"]);
 			client.say(target, string);
