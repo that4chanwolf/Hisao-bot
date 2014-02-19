@@ -258,6 +258,36 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		});
 		return;
 	}
+	if(/^\.yen/.test(text)) {
+		var ammount = +(text.split(" ")[1].split(",").join(""));
+		request("http://query.yahooapis.com/v1/public/yql?q=select%20rate%2Cname%20from%20csv%20where%20url%3D'http%3A%2F%2Fdownload.finance.yahoo.com%2Fd%2Fquotes%3Fs%3DUSDJPY%253DX%26f%3Dl1n'%20and%20columns%3D'rate%2Cname'&format=json&callback=", function(e, r, b) {
+			var result, conv, answer;
+			if(e) {
+				return client.say(target, "ERROR: " + e);
+			}
+			try {
+				result = JSON.parse(b);
+			} catch(err) {
+				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
+			}
+			conv = +(result["query"]["results"]["row"]["rate"]);
+			answer = ammount/conv;
+			
+			var ret = "0"; // This is a string that gets sent, we don't want $103.4665393894 to be sent
+			if(answer < 10) {
+				ret = answer.toString().substr(0, 4);
+			} else if(answer >= 10) {
+				ret = answer.toString().substr(0, 5);
+			} else if(answer >= 100) {
+				ret = answer.toString().substr(0, 6);
+			} else if(answer >= 1000) {
+				ret = answer.toString().substr(0, 7);
+			} else { // Give up
+				ret = answer.toString(); 
+			}
+			client.say(target, text.split(" ")[1] + " Yen = $" + ret);
+		});
+	}
 	if(/^\.(?:source|src)/.test(text)) {
 		return client.say(target, "Hisao-bot source: https://github.com/that4chanwolf/Hisao-bot");
 	}
