@@ -206,7 +206,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 		return;
 	}
 	if(/^\.(?:btc|bitcoin(?:s?)|buttcoin(?:s?))/.test(text)) {
-		request("https://btc-e.com/api/2/ltc_usd/ticker", function(e, r, b) {
+		request("https://btc-e.com/api/2/btc_usd/ticker", function(e, r, b) {
 			var string;
 			if(e) {
 				return client.say(target, "ERROR: " + e);
@@ -217,7 +217,7 @@ client.addListener('message#', function(nick, target, text, message) { // Normal
 				return client.say(target, "ERROR: Error parsing response, probably not in JSON format.");
 			}
 			
-			var buttcoins = JSON.parse(b)["return"];
+			var buttcoins = JSON.parse(b)["ticker"];
 			var colors = irc.colors.codes;
 			string = format("%sHigh: %s$%s | %sLow: %s$%s | %sLast: %s$%s | %sAverage: %s$%s", 
 				colors.light_green, colors.reset, 
